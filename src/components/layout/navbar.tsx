@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { useAuth } from '@/components/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { User } from '@supabase/supabase-js'
-import { Menu, X, Trophy, Calendar, TreeDeciduous, LogOut, User as UserIcon } from 'lucide-react'
-import { useState } from 'react'
+import { Menu, X, Trophy, Calendar, TreeDeciduous, LogOut, User as UserIcon, Settings } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/utils/supabase/client'
 
 interface NavbarProps {
   user: User | null | undefined
@@ -14,11 +15,27 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const { signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          setIsAdmin(data?.is_admin || false)
+        })
+    }
+  }, [user])
 
   const navLinks = [
     { href: '/matches', label: 'Mecze', icon: Calendar },
     { href: '/ko-tree', label: 'Drzewko', icon: TreeDeciduous },
     { href: '/ranking', label: 'Ranking', icon: Trophy },
+    ...(isAdmin ? [{ href: '/admin', label: 'Admin', icon: Settings }] : []),
   ]
 
   return (

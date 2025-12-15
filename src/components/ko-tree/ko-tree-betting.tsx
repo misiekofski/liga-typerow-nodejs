@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TreeDeciduous, Lock, Trophy, ChevronRight } from 'lucide-react'
@@ -37,7 +37,7 @@ export function KOTreeBetting({ userId, isLocked }: KOTreeBettingProps) {
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
 
   useEffect(() => {
     fetchData()

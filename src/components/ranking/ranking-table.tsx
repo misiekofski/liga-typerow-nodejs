@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Trophy, Medal, Target, TreeDeciduous, Star } from 'lucide-react'
 import { Database } from '@/types/database'
@@ -17,7 +17,7 @@ type RankingWithProfile = Database['public']['Tables']['rankings']['Row'] & {
 export function RankingTable({ currentUserId }: RankingTableProps) {
   const [rankings, setRankings] = useState<RankingWithProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
 
   useEffect(() => {
     fetchRankings()

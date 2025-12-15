@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,7 +25,7 @@ export function TodayMatches({ userId }: TodayMatchesProps) {
   const [loading, setLoading] = useState(true)
   const [editingBet, setEditingBet] = useState<string | null>(null)
   const [betScores, setBetScores] = useState<{ a: number; b: number }>({ a: 0, b: 0 })
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
 
   useEffect(() => {
     fetchTodayMatches()

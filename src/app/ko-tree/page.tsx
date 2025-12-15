@@ -1,12 +1,11 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import { Navbar } from '@/components/layout/navbar'
 import { KOTreeBetting } from '@/components/ko-tree/ko-tree-betting'
 
 const KO_TREE_DEADLINE = new Date('2024-06-29T18:00:00')
 
 export default async function KOTreePage() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   const isLocked = new Date() > KO_TREE_DEADLINE

@@ -1,10 +1,9 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import { Navbar } from '@/components/layout/navbar'
 import { RankingTable } from '@/components/ranking/ranking-table'
 
 export default async function RankingPage() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   return (

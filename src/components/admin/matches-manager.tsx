@@ -104,7 +104,9 @@ export function MatchesManager({ showResultsOnly = false }: MatchesManagerProps)
       })
       .eq('id', matchId)
 
-    if (!error) {
+    if (error) {
+      alert(`Błąd: ${error.message}`)
+    } else {
       setEditingResultId(null)
       fetchData()
     }

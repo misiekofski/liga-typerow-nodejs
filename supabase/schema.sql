@@ -148,11 +148,15 @@ CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Matches: everyone can read
+-- Matches: everyone can read, admins can modify
 CREATE POLICY "Matches are viewable by everyone" ON matches FOR SELECT USING (true);
-CREATE POLICY "Matches are editable by admins" ON matches FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true)
-);
+CREATE POLICY "Admins can insert matches" ON matches FOR INSERT 
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+CREATE POLICY "Admins can update matches" ON matches FOR UPDATE 
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true))
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+CREATE POLICY "Admins can delete matches" ON matches FOR DELETE 
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
 
 -- Bets: users can read all (after deadline), manage own (before deadline)
 CREATE POLICY "Users can view own bets" ON bets FOR SELECT USING (auth.uid() = user_id);
@@ -216,6 +220,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -282,6 +287,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_match_finished ON matches;
 CREATE TRIGGER on_match_finished
   AFTER UPDATE ON matches
   FOR EACH ROW EXECUTE FUNCTION update_rankings_after_match();
